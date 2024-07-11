@@ -1,0 +1,9 @@
+{
+  "name": "auth-service",
+  "version": "1.0.0",
+  "description": "User Authentication Management Service",
+  "main": "index.js",
+  "scripts": {},
+  "author": "Sankha Chakraborty <anonproductionspro@gmail.com>",
+  "license": "ISC"
+}
