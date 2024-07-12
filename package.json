@@ -29,5 +29,8 @@
       "pnpm format",
       "pnpm lint:fix"
     ]
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5"
   }
 }

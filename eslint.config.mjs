@@ -6,13 +6,15 @@ export default tseslint.config(
   eslint.configs.recommended,
   ...tseslint.configs.recommended,
   {
+    // files: ["dist/**/*.js", "dist/*"],
+    // extends: [tseslint.configs.disableTypeChecked],
     languageOptions: {
       parserOptions: {
         project: true,
         tsconfigRootDir: import.meta.dirname,
       },
     },
-    ignores: ["dist", "node_modules"],
+    ignores: ["node_modules", "dist", "**/.*"],
     rules: {},
   },
   eslintConfigPrettier,
