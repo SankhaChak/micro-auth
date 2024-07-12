@@ -1,3 +1,17 @@
+import app from "./app";
 import { CONFIG } from "./config";
 
-console.log("Port", CONFIG.PORT, CONFIG.NODE_ENV);
+const startServer = async () => {
+  const port = CONFIG.PORT;
+
+  try {
+    app.listen(port, () => {
+      console.log(`Server running on port ${port}`);
+    });
+  } catch (error) {
+    console.log("🚀 ~ file: index.ts:13 ~ startServer ~ error:", error);
+    process.exit(1);
+  }
+};
+
+startServer();
