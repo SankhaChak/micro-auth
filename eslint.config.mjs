@@ -15,7 +15,16 @@ export default tseslint.config(
       }
     },
     ignores: ["node_modules", "dist", "**/.*"],
-    rules: {}
+    rules: {
+      "@typescript-eslint/naming-convention": [
+        "error",
+        {
+          selector: "parameter",
+          format: ["camelCase"],
+          leadingUnderscore: "allow"
+        }
+      ]
+    }
   },
   eslintConfigPrettier
 );
