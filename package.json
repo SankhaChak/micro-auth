@@ -7,7 +7,8 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "lint": "eslint .",
-    "lint:fix": "eslint --fix ."
+    "lint:fix": "eslint --fix .",
+    "prepare": "husky"
   },
   "author": "Sankha Chakraborty <anonproductionspro@gmail.com>",
   "license": "ISC",
@@ -17,8 +18,16 @@
     "@types/node": "^20.14.10",
     "eslint": "^9.6.0",
     "eslint-config-prettier": "^9.1.0",
+    "husky": "^9.0.11",
+    "lint-staged": "^15.2.7",
     "prettier": "3.3.2",
     "typescript": "^5.5.3",
     "typescript-eslint": "^7.16.0"
+  },
+  "lint-staged": {
+    "*": [
+      "pnpm format",
+      "pnpm lint:fix"
+    ]
   }
 }
