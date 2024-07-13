@@ -13,9 +13,9 @@ class AuthController {
     try {
       const rqBody = req.body;
 
-      await this.userService.create(rqBody);
+      const user = await this.userService.create(rqBody);
 
-      res.status(201).json();
+      res.status(201).json(user);
     } catch (error) {
       if (error instanceof Error) {
         return res.status(500).json({ error: error.message });

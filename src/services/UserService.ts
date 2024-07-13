@@ -10,11 +10,13 @@ class UserService {
   }
 
   async create(params: UserData) {
-    await this.userRepository.save({
+    const user = await this.userRepository.save({
       email: params.email,
       firstName: params.firstName,
       lastName: params.lastName
     });
+
+    return user;
   }
 }
 

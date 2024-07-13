@@ -49,6 +49,11 @@ describe("POST /auth/register", () => {
 
       expect(user).not.toBeNull();
     });
+
+    it("should return the added user id", async () => {
+      const response = await request(app).post("/auth/register").send(userData);
+      expect(response.body.id).toBeDefined();
+    });
   });
   describe("Fields are missing", () => {});
 });
