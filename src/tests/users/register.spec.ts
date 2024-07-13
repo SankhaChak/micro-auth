@@ -3,7 +3,6 @@ import { DataSource } from "typeorm";
 import app from "../../app";
 import { AppDataSource } from "../../data-source";
 import { User } from "../../entity/User";
-import { truncateTables } from "../utils";
 
 describe("POST /auth/register", () => {
   let dataSource: DataSource;
@@ -19,7 +18,8 @@ describe("POST /auth/register", () => {
   });
 
   beforeEach(async () => {
-    await truncateTables(dataSource);
+    await dataSource.dropDatabase();
+    await dataSource.synchronize();
   });
 
   afterAll(async () => {
@@ -53,6 +53,14 @@ describe("POST /auth/register", () => {
     it("should return the added user id", async () => {
       const response = await request(app).post("/auth/register").send(userData);
       expect(response.body.id).toBeDefined();
+    });
+
+    it("should assign customer role to the newly created user", async () => {
+      const response = await request(app).post("/auth/register").send(userData);
+      const userInDb = await dataSource.getRepository(User).findOne({
+        where: { id: response.body.id }
+      });
+      expect(userInDb).toHaveProperty("role", "customer");
     });
   });
   describe("Fields are missing", () => {});

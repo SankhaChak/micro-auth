@@ -1,7 +1,7 @@
 import createHttpError from "http-errors";
 import { Repository } from "typeorm";
 import { User } from "../entity/User";
-import { UserData } from "../types/auth";
+import { UserData, UserRole } from "../types/auth";
 
 class UserService {
   private userRepository: Repository<User>;
@@ -15,7 +15,8 @@ class UserService {
       const user = await this.userRepository.save({
         email: params.email,
         firstName: params.firstName,
-        lastName: params.lastName
+        lastName: params.lastName,
+        role: UserRole.Customer
       });
 
       return user;

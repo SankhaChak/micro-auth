@@ -1,4 +1,5 @@
 import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { UserRole } from "../types/auth";
 
 @Entity()
 export class User {
@@ -14,6 +15,6 @@ export class User {
   @Column()
   email!: string;
 
-  // @Column()
-  // age: number
+  @Column()
+  role!: UserRole;
 }
