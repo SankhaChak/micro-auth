@@ -3,6 +3,7 @@ import { DataSource } from "typeorm";
 import app from "../../app";
 import { AppDataSource } from "../../data-source";
 import { User } from "../../entity/User";
+import HashService from "../../services/HashService";
 
 describe("POST /auth/register", () => {
   let dataSource: DataSource;
@@ -61,6 +62,24 @@ describe("POST /auth/register", () => {
         where: { id: response.body.id }
       });
       expect(userInDb).toHaveProperty("role", "customer");
+    });
+
+    it("should store password in hashed format", async () => {
+      const response = await request(app).post("/auth/register").send(userData);
+      const userInDb = await dataSource.getRepository(User).findOne({
+        where: { id: response.body.id }
+      });
+
+      if (!userInDb) {
+        throw new Error("User not found in the database");
+      }
+
+      const hashService = new HashService();
+      const isPasswordMatch = await hashService.compareStrings(
+        userData.password,
+        userInDb.password
+      );
+      expect(isPasswordMatch).toBe(true);
     });
   });
   describe("Fields are missing", () => {});
