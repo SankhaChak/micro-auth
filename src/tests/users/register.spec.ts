@@ -81,6 +81,20 @@ describe("POST /auth/register", () => {
       );
       expect(isPasswordMatch).toBe(true);
     });
+
+    it("should return 400 if email already exists", async () => {
+      // Register the user first
+      await request(app).post("/auth/register").send(userData);
+
+      // Try to register the same user again
+      const response = await request(app).post("/auth/register").send(userData);
+      expect(response.statusCode).toBe(400);
+
+      const userCreated = await dataSource.getRepository(User).find({
+        where: { email: userData.email }
+      });
+      expect(userCreated).toHaveLength(1);
+    });
   });
   describe("Fields are missing", () => {});
 });

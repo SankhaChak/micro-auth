@@ -15,6 +15,18 @@ class UserService {
 
   async create(params: UserData) {
     try {
+      const doesUserExist = await this.userRepository.findOne({
+        where: { email: params.email }
+      });
+
+      if (doesUserExist) {
+        const error = createHttpError(
+          400,
+          "User with this email already exists"
+        );
+        throw error;
+      }
+
       const hashedPassword = await this.hashService.hashString(params.password);
 
       const user = await this.userRepository.save({
@@ -27,6 +39,10 @@ class UserService {
 
       return user;
     } catch (err) {
+      if (err instanceof createHttpError.HttpError) {
+        throw err;
+      }
+
       const error = createHttpError(500, "Failed to create new user");
       throw error;
     }
