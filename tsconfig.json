@@ -109,6 +109,6 @@
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true
   },
-  "include": ["dist", "**/*.ts", "**/*.mjs"]
+  "include": ["dist", "**/*.ts", "**/*.mjs", "**/*.js"]
   // "exclude": ["app.spec.ts"]
 }

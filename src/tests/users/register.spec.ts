@@ -4,6 +4,7 @@ import app from "../../app";
 import { AppDataSource } from "../../data-source";
 import { User } from "../../entity/User";
 import HashService from "../../services/HashService";
+import { isJwt } from "../utils";
 
 describe("POST /auth/register", () => {
   let dataSource: DataSource;
@@ -94,6 +95,27 @@ describe("POST /auth/register", () => {
         where: { email: userData.email.trim() }
       });
       expect(userCreated).toHaveLength(1);
+    });
+
+    it("should return access and refresh token in a cookie", async () => {
+      const response = await request(app).post("/auth/register").send(userData);
+      const cookies = (response.headers["set-cookie"] || []) as string[];
+
+      let accessToken: string = "";
+      let refreshToken: string = "";
+
+      cookies.forEach((cookie) => {
+        if (cookie.includes("accessToken")) {
+          accessToken = cookie.split(";")[0].split("=")[1];
+        } else if (cookie.includes("refreshToken")) {
+          refreshToken = cookie.split(";")[0].split("=")[1];
+        }
+      });
+
+      expect(accessToken.length).toBeGreaterThan(0);
+      expect(refreshToken.length).toBeGreaterThan(0);
+      expect(isJwt(accessToken)).toBe(true);
+      expect(isJwt(refreshToken)).toBe(true);
     });
   });
 

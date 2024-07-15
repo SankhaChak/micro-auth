@@ -1,7 +1,11 @@
 import type { NextFunction, Response } from "express";
 import { validationResult } from "express-validator";
+import fs from "fs";
 import createHttpError from "http-errors";
+import { JwtPayload, sign } from "jsonwebtoken";
+import path from "path";
 import { Logger } from "winston";
+import { CONFIG } from "../config";
 import UserService from "../services/UserService";
 import { RegisterUserRequest } from "../types/auth";
 
@@ -34,6 +38,44 @@ class AuthController {
       this.logger.info("User has been registered", {
         id: user.id,
         email: user.email
+      });
+
+      let privateKey: string;
+
+      try {
+        privateKey = fs.readFileSync(
+          path.join(__dirname, "../../certs/private.pem"),
+          "utf-8"
+        );
+      } catch (err) {
+        const error = createHttpError(500, "Error reading private key");
+        throw error;
+      }
+
+      const payload: JwtPayload = { sub: String(user.id), role: user.role };
+
+      const accessToken = sign(payload, privateKey, {
+        algorithm: "RS256",
+        expiresIn: "1d",
+        issuer: "auth-service"
+      });
+      const refreshToken = sign(payload, CONFIG.REFRESH_TOKEN_SECRET, {
+        algorithm: "HS256",
+        expiresIn: "7d",
+        issuer: "auth-service"
+      });
+
+      res.cookie("accessToken", accessToken, {
+        httpOnly: true,
+        secure: true,
+        sameSite: "strict",
+        maxAge: 60 * 60 * 24 // 1 day
+      });
+      res.cookie("refreshToken", refreshToken, {
+        httpOnly: true,
+        secure: true,
+        sameSite: "strict",
+        maxAge: 60 * 60 * 24 * 7 // 7 days
       });
 
       res.status(201).json(user);

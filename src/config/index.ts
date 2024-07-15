@@ -12,5 +12,6 @@ export const CONFIG = {
   DB_PORT: +process.env.DB_PORT! || 5432,
   DB_USER: process.env.DB_USER || "test",
   DB_PASSWORD: process.env.DB_PASSWORD || "test",
-  DB_NAME: process.env.DB_NAME || "test"
+  DB_NAME: process.env.DB_NAME || "test",
+  REFRESH_TOKEN_SECRET: process.env.REFRESH_TOKEN_SECRET || "secret"
 };
