@@ -2,6 +2,7 @@ import request from "supertest";
 import { DataSource } from "typeorm";
 import app from "../../app";
 import { AppDataSource } from "../../data-source";
+import { RefreshToken } from "../../entity/RefreshToken";
 import { User } from "../../entity/User";
 import HashService from "../../services/HashService";
 import { isJwt } from "../utils";
@@ -116,6 +117,20 @@ describe("POST /auth/register", () => {
       expect(refreshToken.length).toBeGreaterThan(0);
       expect(isJwt(accessToken)).toBe(true);
       expect(isJwt(refreshToken)).toBe(true);
+    });
+
+    it("should store the refresh token in the database", async () => {
+      const response = await request(app).post("/auth/register").send(userData);
+      const user = await dataSource.getRepository(User).findOne({
+        where: { id: response.body.id }
+      });
+
+      const tokens = await dataSource
+        .createQueryBuilder(RefreshToken, "rt")
+        .where("rt.user = :userId", { userId: user?.id })
+        .getMany();
+
+      expect(tokens).toHaveLength(1);
     });
   });
 

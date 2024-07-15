@@ -6,6 +6,8 @@ import { JwtPayload, sign } from "jsonwebtoken";
 import path from "path";
 import { Logger } from "winston";
 import { CONFIG } from "../config";
+import { AppDataSource } from "../data-source";
+import { RefreshToken } from "../entity/RefreshToken";
 import UserService from "../services/UserService";
 import { RegisterUserRequest } from "../types/auth";
 
@@ -59,10 +61,17 @@ class AuthController {
         expiresIn: "1d",
         issuer: "auth-service"
       });
+
+      await AppDataSource.getRepository(RefreshToken).save({
+        user,
+        expiresAt: new Date(Date.now() + 60 * 60 * 24 * 7 * 1000)
+      });
+
       const refreshToken = sign(payload, CONFIG.REFRESH_TOKEN_SECRET, {
         algorithm: "HS256",
         expiresIn: "7d",
-        issuer: "auth-service"
+        issuer: "auth-service",
+        jwtid: String(user.id)
       });
 
       res.cookie("accessToken", accessToken, {
