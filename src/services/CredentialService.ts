@@ -1,6 +1,6 @@
 import bcrypt from "bcrypt";
 
-class HashService {
+class CredentialService {
   private saltRounds: number = 10;
 
   constructor(saltRounds?: number) {
@@ -21,4 +21,4 @@ class HashService {
   }
 }
 
-export default HashService;
+export default CredentialService;

@@ -10,22 +10,22 @@ import { CONFIG } from "../config";
 import { AppDataSource } from "../data-source";
 import { RefreshToken } from "../entity/RefreshToken";
 import { User } from "../entity/User";
-import HashService from "../services/HashService";
+import CredentialService from "../services/CredentialService";
 import UserService from "../services/UserService";
 import { RegisterUserRequest } from "../types/auth";
 
 class AuthController {
   private userService: UserService;
-  private hashService: HashService;
+  private credentialService: CredentialService;
   private logger: Logger;
 
   constructor(
     userService: UserService,
-    hashService: HashService,
+    credentialService: CredentialService,
     logger: Logger
   ) {
     this.userService = userService;
-    this.hashService = hashService;
+    this.credentialService = credentialService;
     this.logger = logger;
   }
 
@@ -83,7 +83,7 @@ class AuthController {
         throw error;
       }
 
-      const isValidPassowrd = await this.hashService.compareStrings(
+      const isValidPassowrd = await this.credentialService.compareStrings(
         rqBody.password,
         user.password
       );

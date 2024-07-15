@@ -2,15 +2,18 @@ import createHttpError from "http-errors";
 import { Repository } from "typeorm";
 import { User } from "../entity/User";
 import { UserData, UserRole } from "../types/auth";
-import HashService from "./HashService";
+import CredentialService from "./CredentialService";
 
 class UserService {
   private userRepository: Repository<User>;
-  private hashService: HashService;
+  private credentialService: CredentialService;
 
-  constructor(userRepository: Repository<User>, hashService: HashService) {
+  constructor(
+    userRepository: Repository<User>,
+    credentialService: CredentialService
+  ) {
     this.userRepository = userRepository;
-    this.hashService = hashService;
+    this.credentialService = credentialService;
   }
 
   async create(params: UserData) {
@@ -27,7 +30,9 @@ class UserService {
         throw error;
       }
 
-      const hashedPassword = await this.hashService.hashString(params.password);
+      const hashedPassword = await this.credentialService.hashString(
+        params.password
+      );
 
       const user = await this.userRepository.save({
         email: params.email,

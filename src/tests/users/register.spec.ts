@@ -4,7 +4,7 @@ import app from "../../app";
 import { AppDataSource } from "../../data-source";
 import { RefreshToken } from "../../entity/RefreshToken";
 import { User } from "../../entity/User";
-import HashService from "../../services/HashService";
+import CredentialService from "../../services/CredentialService";
 import { isJwt } from "../utils";
 
 describe("POST /auth/register", () => {
@@ -76,7 +76,7 @@ describe("POST /auth/register", () => {
         throw new Error("User not found in the database");
       }
 
-      const hashService = new HashService();
+      const hashService = new CredentialService();
       const isPasswordMatch = await hashService.compareStrings(
         userData.password,
         userInDb.password
