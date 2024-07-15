@@ -10,7 +10,7 @@ describe("POST /auth/register", () => {
   const userData = {
     firstName: "Sankha",
     lastName: "Chakraborty",
-    email: "iamsankhachak@gmail.com",
+    email: "  iamsankhachak@gmail.com  ",
     password: "passwordSecret"
   };
 
@@ -45,7 +45,7 @@ describe("POST /auth/register", () => {
 
       const userRepository = dataSource.getRepository(User);
       const user = await userRepository.findOne({
-        where: { email: userData.email }
+        where: { email: userData.email.trim() }
       });
 
       expect(user).not.toBeNull();
@@ -91,10 +91,90 @@ describe("POST /auth/register", () => {
       expect(response.statusCode).toBe(400);
 
       const userCreated = await dataSource.getRepository(User).find({
-        where: { email: userData.email }
+        where: { email: userData.email.trim() }
       });
       expect(userCreated).toHaveLength(1);
     });
   });
-  describe("Fields are missing", () => {});
+
+  describe("Fields are missing", () => {
+    it("should return 400 status code if email is not available", async () => {
+      const userDataWithoutEmail = { ...userData } as { email?: string };
+      delete userDataWithoutEmail.email;
+
+      const response = await request(app)
+        .post("/auth/register")
+        .send(userDataWithoutEmail);
+      expect(response.statusCode).toBe(400);
+
+      const userCreated = await dataSource.getRepository(User).find({
+        where: { email: userData.email }
+      });
+      expect(userCreated).toHaveLength(0);
+    });
+
+    it("should return 400 if password is missing", async () => {
+      const userDataWithoutPassword = { ...userData } as { password?: string };
+      delete userDataWithoutPassword.password;
+
+      const response = await request(app)
+        .post("/auth/register")
+        .send(userDataWithoutPassword);
+      expect(response.statusCode).toBe(400);
+
+      const userCreated = await dataSource.getRepository(User).find({
+        where: { email: userData.email }
+      });
+      expect(userCreated).toHaveLength(0);
+    });
+  });
+
+  describe("Fields are not in correct format", () => {
+    it("should trim the email before saving to DB", async () => {
+      const response = await request(app).post("/auth/register").send(userData);
+      const userCreated = await dataSource.getRepository(User).findOne({
+        where: { id: response.body.id }
+      });
+
+      if (!userCreated) {
+        throw new Error("User not found in the database");
+      }
+
+      expect(userCreated.email).toBe(userData.email.trim());
+    });
+
+    it("should return 400 if email is not in correct format", async () => {
+      const userDataWithInvalidEmail = {
+        ...userData,
+        email: "invalid-email"
+      };
+
+      const response = await request(app)
+        .post("/auth/register")
+        .send(userDataWithInvalidEmail);
+      expect(response.statusCode).toBe(400);
+
+      const userCreated = await dataSource.getRepository(User).find({
+        where: { email: userData.email }
+      });
+      expect(userCreated).toHaveLength(0);
+    });
+
+    it("should return 400 if password length < 8 chars", async () => {
+      const userDataWithShortPassword = {
+        ...userData,
+        password: "short"
+      };
+
+      const response = await request(app)
+        .post("/auth/register")
+        .send(userDataWithShortPassword);
+      expect(response.statusCode).toBe(400);
+
+      const userCreated = await dataSource.getRepository(User).find({
+        where: { email: userData.email }
+      });
+      expect(userCreated).toHaveLength(0);
+    });
+  });
 });

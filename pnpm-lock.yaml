@@ -14,6 +14,9 @@ dependencies:
   express:
     specifier: ^4.19.2
     version: 4.19.2
+  express-validator:
+    specifier: ^7.1.0
+    version: 7.1.0
   http-errors:
     specifier: ^2.0.0
     version: 2.0.0
@@ -43,6 +46,9 @@ devDependencies:
   "@types/express":
     specifier: ^4.17.21
     version: 4.17.21
+  "@types/express-validator":
+    specifier: ^3.0.0
+    version: 3.0.0
   "@types/http-errors":
     specifier: ^2.0.4
     version: 2.0.4
@@ -1237,6 +1243,16 @@ packages:
       "@types/qs": 6.9.15
       "@types/range-parser": 1.2.7
       "@types/send": 0.17.4
+    dev: true
+
+  /@types/express-validator@3.0.0:
+    resolution:
+      {
+        integrity: sha512-LusnB0YhTXpBT25PXyGPQlK7leE1e41Vezq1hHEUwjfkopM1Pkv2X2Ppxqh9c+w/HZ6Udzki8AJotKNjDTGdkQ==
+      }
+    deprecated: This is a stub types definition for express-validator (https://github.com/ctavan/express-validator). express-validator provides its own type definitions, so you don't need @types/express-validator installed!
+    dependencies:
+      express-validator: 7.1.0
     dev: true
 
   /@types/express@4.17.21:
@@ -2971,6 +2987,16 @@ packages:
       jest-util: 29.7.0
     dev: true
 
+  /express-validator@7.1.0:
+    resolution:
+      {
+        integrity: sha512-ePn6NXjHRZiZkwTiU1Rl2hy6aUqmi6Cb4/s8sfUsKH7j2yYl9azSpl8xEHcOj1grzzQ+UBEoLWtE1s6FDxW++g==
+      }
+    engines: { node: ">= 8.0.0" }
+    dependencies:
+      lodash: 4.17.21
+      validator: 13.12.0
+
   /express@4.19.2:
     resolution:
       {
@@ -4569,6 +4595,12 @@ packages:
         integrity: sha512-0KpjqXRVvrYyCsX1swR/XTK0va6VQkQM6MNo7PqW77ByjAhoARA8EfrP1N4+KlKj8YS0ZUCtRT/YUuhyYDujIQ==
       }
     dev: true
+
+  /lodash@4.17.21:
+    resolution:
+      {
+        integrity: sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==
+      }
 
   /log-update@6.0.0:
     resolution:
@@ -6553,6 +6585,13 @@ packages:
       "@types/istanbul-lib-coverage": 2.0.6
       convert-source-map: 2.0.0
     dev: true
+
+  /validator@13.12.0:
+    resolution:
+      {
+        integrity: sha512-c1Q0mCiPlgdTVVVIJIrBuxNicYE+t/7oKeI9MWLj3fh/uq2Pxh/3eeWbVZ4OcGW1TUf53At0njHw5SMdA3tmMg==
+      }
+    engines: { node: ">= 0.10" }
 
   /vary@1.1.2:
     resolution:

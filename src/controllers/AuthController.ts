@@ -1,4 +1,6 @@
 import type { NextFunction, Response } from "express";
+import { validationResult } from "express-validator";
+import createHttpError from "http-errors";
 import { Logger } from "winston";
 import UserService from "../services/UserService";
 import { RegisterUserRequest } from "../types/auth";
@@ -15,6 +17,13 @@ class AuthController {
   async register(req: RegisterUserRequest, res: Response, next: NextFunction) {
     try {
       const rqBody = req.body;
+
+      const result = validationResult(req);
+      if (!result.isEmpty()) {
+        const error = createHttpError(400, result.array());
+        throw error;
+      }
+
       this.logger.debug("Request to register new user", {
         email: rqBody.email,
         firstName: rqBody.firstName,
