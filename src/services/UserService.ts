@@ -47,6 +47,23 @@ class UserService {
       throw error;
     }
   }
+
+  async findByEmail(email: string) {
+    try {
+      const user = await this.userRepository.findOne({
+        where: { email }
+      });
+
+      return user;
+    } catch (err) {
+      if (err instanceof createHttpError.HttpError) {
+        throw err;
+      }
+
+      const error = createHttpError(500, "Failed to find user by email");
+      throw error;
+    }
+  }
 }
 
 export default UserService;

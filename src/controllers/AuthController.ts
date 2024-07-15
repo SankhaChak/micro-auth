@@ -3,20 +3,29 @@ import { validationResult } from "express-validator";
 import fs from "fs";
 import createHttpError from "http-errors";
 import { JwtPayload, sign } from "jsonwebtoken";
+import omit from "lodash/omit";
 import path from "path";
 import { Logger } from "winston";
 import { CONFIG } from "../config";
 import { AppDataSource } from "../data-source";
 import { RefreshToken } from "../entity/RefreshToken";
+import { User } from "../entity/User";
+import HashService from "../services/HashService";
 import UserService from "../services/UserService";
 import { RegisterUserRequest } from "../types/auth";
 
 class AuthController {
   private userService: UserService;
+  private hashService: HashService;
   private logger: Logger;
 
-  constructor(userService: UserService, logger: Logger) {
+  constructor(
+    userService: UserService,
+    hashService: HashService,
+    logger: Logger
+  ) {
     this.userService = userService;
+    this.hashService = hashService;
     this.logger = logger;
   }
 
@@ -42,6 +51,65 @@ class AuthController {
         email: user.email
       });
 
+      const sanitizedUser = omit(user, ["password"]);
+
+      await this.attachTokenCookies(sanitizedUser, res, next);
+
+      res.status(201).json(user);
+    } catch (error) {
+      next(error);
+      return;
+    }
+  }
+
+  async login(req: RegisterUserRequest, res: Response, next: NextFunction) {
+    try {
+      const rqBody = req.body;
+
+      const result = validationResult(req);
+      if (!result.isEmpty()) {
+        const error = createHttpError(400, result.array());
+        throw error;
+      }
+
+      this.logger.debug("Request to login", {
+        email: rqBody.email
+      });
+
+      const user = await this.userService.findByEmail(rqBody.email);
+
+      if (!user) {
+        const error = createHttpError(401, "Invalid email or password");
+        throw error;
+      }
+
+      const isValidPassowrd = await this.hashService.compareStrings(
+        rqBody.password,
+        user.password
+      );
+
+      if (!isValidPassowrd) {
+        const error = createHttpError(401, "Invalid email or password");
+        throw error;
+      }
+
+      const sanitizedUser = omit(user, ["password"]);
+
+      await this.attachTokenCookies(sanitizedUser, res, next);
+
+      res.status(200).json(sanitizedUser);
+    } catch (error) {
+      next(error);
+      return;
+    }
+  }
+
+  async attachTokenCookies(
+    user: Partial<User>,
+    res: Response,
+    next: NextFunction
+  ) {
+    try {
       let privateKey: string;
 
       try {
@@ -86,8 +154,6 @@ class AuthController {
         sameSite: "strict",
         maxAge: 60 * 60 * 24 * 7 // 7 days
       });
-
-      res.status(201).json(user);
     } catch (error) {
       next(error);
       return;
