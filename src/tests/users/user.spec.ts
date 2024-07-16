@@ -74,5 +74,23 @@ describe("GET /auth/validate-user", () => {
 
       expect(loginResponse.body.id).toBe(response.body.id);
     });
+
+    it("should not return user password in the response", async () => {
+      const response = await request(app)
+        .post("/auth/register")
+        .send(registrationUserData);
+
+      const accessToken = jwks.token({
+        sub: response.body.id,
+        role: response.body.role
+      });
+
+      const loginResponse = await request(app)
+        .get(endpoint)
+        .set("Cookie", [`accessToken=${accessToken};`])
+        .send();
+
+      expect(loginResponse.body).not.toHaveProperty("password");
+    });
   });
 });

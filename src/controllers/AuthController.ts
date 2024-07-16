@@ -55,7 +55,7 @@ class AuthController {
         email: user.email
       });
 
-      const sanitizedUser = omit(user, ["password"]);
+      const sanitizedUser = this.getSanitizedUser(user);
 
       await this.attachTokenCookies(sanitizedUser, res, next);
 
@@ -97,7 +97,7 @@ class AuthController {
         throw error;
       }
 
-      const sanitizedUser = omit(user, ["password"]);
+      const sanitizedUser = this.getSanitizedUser(user);
 
       await this.attachTokenCookies(sanitizedUser, res, next);
 
@@ -117,7 +117,7 @@ class AuthController {
         throw error;
       }
 
-      const sanitizedUser = omit(user, ["password"]);
+      const sanitizedUser = this.getSanitizedUser(user);
 
       res.status(200).send(sanitizedUser);
     } catch (error) {
@@ -180,6 +180,10 @@ class AuthController {
       next(error);
       return;
     }
+  }
+
+  getSanitizedUser(user: User) {
+    return omit(user, ["password"]);
   }
 }
 
