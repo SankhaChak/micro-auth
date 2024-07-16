@@ -20,7 +20,7 @@ describe("GET /auth/validate-user", () => {
   let jwks: ReturnType<typeof createJWKsMock>;
 
   beforeAll(async () => {
-    jwks = createJWKsMock("http://localhost:5501");
+    jwks = createJWKsMock("http://localhost:5001");
     dataSource = await AppDataSource.initialize();
   });
 
@@ -91,6 +91,14 @@ describe("GET /auth/validate-user", () => {
         .send();
 
       expect(loginResponse.body).not.toHaveProperty("password");
+    });
+  });
+
+  describe("No access token provided", () => {
+    it("should return 401 status code", async () => {
+      const response = await request(app).get(endpoint).send();
+
+      expect(response.statusCode).toBe(401);
     });
   });
 });

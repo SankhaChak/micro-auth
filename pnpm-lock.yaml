@@ -38,6 +38,9 @@ dependencies:
   reflect-metadata:
     specifier: ^0.1.13
     version: 0.1.14
+  rsa-pem-to-jwk:
+    specifier: ^1.1.3
+    version: 1.1.3
   typeorm:
     specifier: 0.3.20
     version: 0.3.20(pg@8.12.0)(ts-node@10.9.1)
@@ -5314,6 +5317,14 @@ packages:
       set-blocking: 2.0.0
     dev: false
 
+  /object-assign@2.1.1:
+    resolution:
+      {
+        integrity: sha512-CdsOUYIh5wIiozhJ3rLQgmUTgcyzFwZZrqhkKhODMoGtPKM+wt0h0CNIoauJWMsS9822EdzPsF/6mb4nLvPN5g==
+      }
+    engines: { node: ">=0.10.0" }
+    dev: false
+
   /object-assign@4.1.1:
     resolution:
       {
@@ -5375,6 +5386,15 @@ packages:
     dependencies:
       mimic-fn: 4.0.0
     dev: true
+
+  /optimist@0.3.7:
+    resolution:
+      {
+        integrity: sha512-TCx0dXQzVtSCg2OgY/bO9hjM9cV4XYx09TVK+s3+FhkjT6LovsLe+pPMzpWf+6yXK/hUizs2gUoTw3jHM0VaTQ==
+      }
+    dependencies:
+      wordwrap: 0.0.3
+    dev: false
 
   /optionator@0.9.4:
     resolution:
@@ -5985,6 +6005,26 @@ packages:
     hasBin: true
     dependencies:
       glob: 7.2.3
+
+  /rsa-pem-to-jwk@1.1.3:
+    resolution:
+      {
+        integrity: sha512-ZlVavEvTnD8Rzh/pdB8NH4VF5GNEtF6biGQcTtC4GKFMsbZR08oHtOYefbhCN+JnJIuMItiCDCMycdcMrw6blA==
+      }
+    dependencies:
+      object-assign: 2.1.1
+      rsa-unpack: 0.0.6
+    dev: false
+
+  /rsa-unpack@0.0.6:
+    resolution:
+      {
+        integrity: sha512-HRrl8GHjjPziPFRDJPq/v5OxZ3IPdksV5h3cime/oHgcgM1k1toO5OdtzClgBqRf5dF6IgptOB0g/zFb0w5zQw==
+      }
+    hasBin: true
+    dependencies:
+      optimist: 0.3.7
+    dev: false
 
   /run-parallel@1.2.0:
     resolution:
@@ -6990,6 +7030,14 @@ packages:
       }
     engines: { node: ">=0.10.0" }
     dev: true
+
+  /wordwrap@0.0.3:
+    resolution:
+      {
+        integrity: sha512-1tMA907+V4QmxV7dbRvb4/8MaRALK6q9Abid3ndMYnbyo8piisCmeONVqVSXqQA3KaP4SLt5b7ud6E2sqP8TFw==
+      }
+    engines: { node: ">=0.4.0" }
+    dev: false
 
   /wrap-ansi@7.0.0:
     resolution:
