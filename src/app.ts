@@ -1,3 +1,4 @@
+import cookieParser from "cookie-parser";
 import express, { NextFunction, Request, Response } from "express";
 import { HttpError } from "http-errors";
 import "reflect-metadata";
@@ -6,11 +7,13 @@ import authRouter from "./routes/auth";
 
 const app = express();
 
-app.get("/", (req, res) => {
+app.get("/", (_req, res) => {
   res.send("Hello World");
 });
 
+app.use(cookieParser());
 app.use(express.json());
+
 app.use("/auth", authRouter);
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars

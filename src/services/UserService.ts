@@ -69,6 +69,23 @@ class UserService {
       throw error;
     }
   }
+
+  async findById(id: string) {
+    try {
+      const user = await this.userRepository.findOne({
+        where: { id: +id }
+      });
+
+      return user;
+    } catch (err) {
+      if (err instanceof createHttpError.HttpError) {
+        throw err;
+      }
+
+      const error = createHttpError(500, "Failed to find user by id");
+      throw error;
+    }
+  }
 }
 
 export default UserService;

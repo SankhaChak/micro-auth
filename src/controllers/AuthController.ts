@@ -12,7 +12,11 @@ import { RefreshToken } from "../entity/RefreshToken";
 import { User } from "../entity/User";
 import CredentialService from "../services/CredentialService";
 import UserService from "../services/UserService";
-import { RegisterUserRequest } from "../types/auth";
+import {
+  AuthRequest,
+  LoginUserRequest,
+  RegisterUserRequest
+} from "../types/auth";
 
 class AuthController {
   private userService: UserService;
@@ -62,7 +66,7 @@ class AuthController {
     }
   }
 
-  async login(req: RegisterUserRequest, res: Response, next: NextFunction) {
+  async login(req: LoginUserRequest, res: Response, next: NextFunction) {
     try {
       const rqBody = req.body;
 
@@ -98,6 +102,24 @@ class AuthController {
       await this.attachTokenCookies(sanitizedUser, res, next);
 
       res.status(200).json(sanitizedUser);
+    } catch (error) {
+      next(error);
+      return;
+    }
+  }
+
+  async validateUser(req: AuthRequest, res: Response, next: NextFunction) {
+    try {
+      const user = await this.userService.findById(req.auth.sub);
+
+      if (!user) {
+        const error = createHttpError(404, "User not found");
+        throw error;
+      }
+
+      const sanitizedUser = omit(user, ["password"]);
+
+      res.status(200).send(sanitizedUser);
     } catch (error) {
       next(error);
       return;
