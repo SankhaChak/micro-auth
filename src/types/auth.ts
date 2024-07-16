@@ -26,6 +26,7 @@ export enum UserRole {
 
 export interface AuthRequest extends Request {
   auth: {
+    id?: string;
     sub: string;
     role: UserRole;
   };

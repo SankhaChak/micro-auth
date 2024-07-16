@@ -129,7 +129,11 @@ describe("POST /auth/login", () => {
     it("should trim the email before trying to login", async () => {
       const response = await request(app).post(endpoint).send(userData);
 
-      expect(response.body.email).toBe(userData.email.trim());
+      const user = await dataSource.getRepository(User).findOne({
+        where: { id: response.body.id }
+      });
+
+      expect(user?.email).toBe(registrationUserData.email.trim());
     });
   });
 });

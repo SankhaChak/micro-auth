@@ -1,16 +1,15 @@
 import type { NextFunction, Response } from "express";
 import { validationResult } from "express-validator";
-import fs from "fs";
 import createHttpError from "http-errors";
-import { JwtPayload, sign } from "jsonwebtoken";
+import { JwtPayload } from "jsonwebtoken";
 import omit from "lodash/omit";
-import path from "path";
+import { Repository } from "typeorm";
 import { Logger } from "winston";
-import { CONFIG } from "../config";
 import { AppDataSource } from "../data-source";
 import { RefreshToken } from "../entity/RefreshToken";
 import { User } from "../entity/User";
 import CredentialService from "../services/CredentialService";
+import TokenService from "../services/TokenService";
 import UserService from "../services/UserService";
 import {
   AuthRequest,
@@ -20,16 +19,25 @@ import {
 
 class AuthController {
   private userService: UserService;
+  private tokenService: TokenService;
   private credentialService: CredentialService;
+
+  private refreshTokenRepository: Repository<RefreshToken>;
+
   private logger: Logger;
 
   constructor(
     userService: UserService,
+    tokenService: TokenService,
     credentialService: CredentialService,
     logger: Logger
   ) {
     this.userService = userService;
+    this.tokenService = tokenService;
     this.credentialService = credentialService;
+
+    this.refreshTokenRepository = AppDataSource.getRepository(RefreshToken);
+
     this.logger = logger;
   }
 
@@ -55,11 +63,9 @@ class AuthController {
         email: user.email
       });
 
-      const sanitizedUser = this.getSanitizedUser(user);
+      await this.attachTokenCookies(user, res, next);
 
-      await this.attachTokenCookies(sanitizedUser, res, next);
-
-      res.status(201).json(user);
+      res.status(201).json({ id: user.id });
     } catch (error) {
       next(error);
       return;
@@ -97,11 +103,9 @@ class AuthController {
         throw error;
       }
 
-      const sanitizedUser = this.getSanitizedUser(user);
+      await this.attachTokenCookies(user, res, next);
 
-      await this.attachTokenCookies(sanitizedUser, res, next);
-
-      res.status(200).json(sanitizedUser);
+      res.status(200).json({ id: user.id });
     } catch (error) {
       next(error);
       return;
@@ -126,55 +130,63 @@ class AuthController {
     }
   }
 
+  async refresh(req: AuthRequest, res: Response, next: NextFunction) {
+    try {
+      const user = await this.userService.findById(req.auth.sub);
+
+      if (!user) {
+        const error = createHttpError(404, "User not found");
+        throw error;
+      }
+
+      const sanitizedUser = this.getSanitizedUser(user);
+
+      await this.tokenService.deleteRefreshToken(req.auth.id as string);
+      await this.attachTokenCookies(sanitizedUser, res, next);
+
+      res.status(200).json({});
+    } catch (error) {
+      next(error);
+      return;
+    }
+  }
+
   async attachTokenCookies(
     user: Partial<User>,
     res: Response,
     next: NextFunction
   ) {
     try {
-      let privateKey: string;
+      const sanitizedUser = this.getSanitizedUser(user as User);
 
-      try {
-        privateKey = fs.readFileSync(
-          path.join(__dirname, "../../certs/private.pem"),
-          "utf-8"
-        );
-      } catch (err) {
-        const error = createHttpError(500, "Error reading private key");
-        throw error;
-      }
+      const payload: JwtPayload = {
+        sub: String(sanitizedUser.id),
+        role: sanitizedUser.role
+      };
 
-      const payload: JwtPayload = { sub: String(user.id), role: user.role };
+      const accessToken = this.tokenService.generateAccessToken(payload);
 
-      const accessToken = sign(payload, privateKey, {
-        algorithm: "RS256",
-        expiresIn: "1d",
-        issuer: "auth-service"
-      });
-
-      await AppDataSource.getRepository(RefreshToken).save({
+      const refreshTokenInDb = await this.refreshTokenRepository.save({
         user,
         expiresAt: new Date(Date.now() + 60 * 60 * 24 * 7 * 1000)
       });
 
-      const refreshToken = sign(payload, CONFIG.REFRESH_TOKEN_SECRET, {
-        algorithm: "HS256",
-        expiresIn: "7d",
-        issuer: "auth-service",
-        jwtid: String(user.id)
+      const refreshToken = this.tokenService.generateRefreshToken({
+        ...payload,
+        id: refreshTokenInDb.id
       });
 
       res.cookie("accessToken", accessToken, {
         httpOnly: true,
         secure: true,
         sameSite: "strict",
-        maxAge: 60 * 60 * 24 // 1 day
+        maxAge: 60 * 60 * 24 * 1000 // 1 day
       });
       res.cookie("refreshToken", refreshToken, {
         httpOnly: true,
         secure: true,
         sameSite: "strict",
-        maxAge: 60 * 60 * 24 * 7 // 7 days
+        maxAge: 60 * 60 * 24 * 7 * 1000 // 7 days
       });
     } catch (error) {
       next(error);
