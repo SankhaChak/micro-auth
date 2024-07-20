@@ -8,7 +8,9 @@ import authenticateMiddleware from "../middlewares/authenticate";
 import canAccess from "../middlewares/canAccess";
 import TenantService from "../services/TenantService";
 import { UserRole } from "../types/auth";
-import createTenantValidator from "../validators/tenant-validator";
+import createTenantValidator, {
+  updateTenantValidator
+} from "../validators/tenant-validator";
 
 const router = express.Router();
 const tenantRepository = AppDataSource.getRepository(Tenant);
@@ -32,6 +34,13 @@ router.get("/", (req: Request, res: Response, next: NextFunction) =>
 
 router.get("/:id", (req: Request, res: Response, next: NextFunction) =>
   tenantController.getTenant(req, res, next)
+);
+
+router.patch(
+  "/:id",
+  updateTenantValidator,
+  (req: Request, res: Response, next: NextFunction) =>
+    tenantController.updateTenant(req, res, next)
 );
 
 export default router;

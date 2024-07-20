@@ -55,6 +55,30 @@ class TenantService {
       throw error;
     }
   }
+
+  async update(id: string, params: Partial<TenantData>) {
+    try {
+      const tenant = await this.tenantRepository.findOne({
+        where: { id: +id }
+      });
+
+      if (!tenant) {
+        const error = createHttpError(404, "Tenant not found");
+        throw error;
+      }
+
+      await this.tenantRepository.update({ id: +id }, params);
+
+      return tenant;
+    } catch (error) {
+      if (error instanceof createHttpError.HttpError) {
+        throw error;
+      }
+
+      const err = createHttpError(500, "Failed to update tenant");
+      throw err;
+    }
+  }
 }
 
 export default TenantService;

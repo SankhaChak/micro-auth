@@ -61,6 +61,27 @@ class TenantController {
       return next(err);
     }
   }
+
+  async updateTenant(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { id } = req.params;
+
+      const rqBody = req.body;
+
+      const result = validationResult(req);
+      if (!result.isEmpty()) {
+        const error = createHttpError(400, result.array());
+        throw error;
+      }
+
+      const tenant = await this.tenantService.update(id, rqBody);
+
+      return res.status(200).json(tenant);
+    } catch (error) {
+      this.logger.error(error);
+      return next(error);
+    }
+  }
 }
 
 export default TenantController;
