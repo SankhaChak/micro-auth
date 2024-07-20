@@ -1,12 +1,9 @@
-import { JwtPayload } from "jsonwebtoken";
 import createJWKsMock from "mock-jwks";
 import request from "supertest";
 import { DataSource } from "typeorm";
 import app from "../../app";
 import { AppDataSource } from "../../data-source";
-import { RefreshToken } from "../../entity/RefreshToken";
-import TokenService from "../../services/TokenService";
-import { isJwt } from "../utils";
+import { extractAuthTokensFromCookies, isJwt } from "../utils";
 
 describe("GET /auth/validate-user", () => {
   let dataSource: DataSource;
@@ -18,10 +15,10 @@ describe("GET /auth/validate-user", () => {
     email: "  iamsankhachak@gmail.com  ",
     password: "passwordSecret"
   };
-  //   const userData = {
-  //     email: "  iamsankhachak@gmail.com  ",
-  //     password: "passwordSecret"
-  //   };
+  // const userData = {
+  //   email: "  iamsankhachak@gmail.com  ",
+  //   password: "passwordSecret"
+  // };
   let jwks: ReturnType<typeof createJWKsMock>;
 
   beforeAll(async () => {
@@ -103,22 +100,15 @@ describe("GET /auth/validate-user", () => {
         .post("/auth/register")
         .send(registrationUserData);
 
-      const refreshTokenInDb = await dataSource
-        .getRepository(RefreshToken)
-        .save({
-          user: response.body,
-          expiresAt: new Date(Date.now() + 60 * 60 * 24 * 7 * 1000)
-        });
+      const cookiesInResponse = (response.headers["set-cookie"] ||
+        []) as string[];
 
-      const payload: JwtPayload = {
-        id: refreshTokenInDb.id,
+      const { refreshToken } = extractAuthTokensFromCookies(cookiesInResponse);
+
+      const accessToken = jwks.token({
         sub: response.body.id,
         role: response.body.role
-      };
-
-      const tokenService = new TokenService();
-
-      const refreshToken = tokenService.generateRefreshToken(payload);
+      });
 
       const refreshResponse = await request(app)
         .post(refreshTokenEndpoint)
@@ -126,16 +116,11 @@ describe("GET /auth/validate-user", () => {
         .send();
 
       const cookies = (refreshResponse.headers["set-cookie"] || []) as string[];
+      const { accessToken: newAccessToken } =
+        extractAuthTokensFromCookies(cookies);
 
-      let accessToken: string = "";
-
-      cookies.forEach((cookie) => {
-        if (cookie.includes("accessToken")) {
-          accessToken = cookie.split(";")[0].split("=")[1];
-        }
-      });
-
-      expect(accessToken.length).toBeGreaterThan(0);
+      expect(newAccessToken.length).toBeGreaterThan(0);
+      expect(accessToken).not.toBe(newAccessToken);
       expect(isJwt(accessToken)).toBe(true);
     });
   });

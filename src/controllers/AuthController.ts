@@ -112,6 +112,27 @@ class AuthController {
     }
   }
 
+  async logout(req: AuthRequest, res: Response, next: NextFunction) {
+    try {
+      const refreshTokenId = req.auth.id;
+
+      if (!refreshTokenId) {
+        const error = createHttpError(400, "Refresh token is missing");
+        throw error;
+      }
+
+      await this.tokenService.deleteRefreshToken(refreshTokenId);
+
+      res.clearCookie("accessToken");
+      res.clearCookie("refreshToken");
+
+      res.status(200).json({});
+    } catch (error) {
+      next(error);
+      return;
+    }
+  }
+
   async validateUser(req: AuthRequest, res: Response, next: NextFunction) {
     try {
       const user = await this.userService.findById(req.auth.sub);
@@ -165,6 +186,10 @@ class AuthController {
       };
 
       const accessToken = this.tokenService.generateAccessToken(payload);
+
+      // this.logger.info("Generated access token", {
+      //   accessToken
+      // });
 
       const refreshTokenInDb = await this.refreshTokenRepository.save({
         user,
