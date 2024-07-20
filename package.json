@@ -12,7 +12,10 @@
     "dev": "cross-env NODE_ENV=dev nodemon src/index.ts",
     "test": "jest --watch --runInBand",
     "start": "ts-node src/index.ts",
-    "typeorm": "typeorm-ts-node-commonjs"
+    "migration:generate:dev": "cross-env NODE_ENV=dev typeorm-ts-node-commonjs migration:generate",
+    "migration:run:dev": "cross-env NODE_ENV=dev typeorm-ts-node-commonjs migration:run -d src/data-source.ts",
+    "migration:generate:prod": "cross-env NODE_ENV=production typeorm-ts-node-commonjs migration:generate",
+    "migration:run:prod": "cross-env NODE_ENV=production typeorm-ts-node-commonjs migration:run -d src/data-source.ts"
   },
   "author": "Sankha Chakraborty <anonproductionspro@gmail.com>",
   "license": "ISC",
