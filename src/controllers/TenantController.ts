@@ -82,6 +82,30 @@ class TenantController {
       return next(error);
     }
   }
+
+  async deleteTenant(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { id } = req.params;
+
+      await this.tenantService.delete(id);
+
+      return res.status(204).send();
+    } catch (error) {
+      this.logger.error(error);
+      return next(error);
+    }
+  }
+
+  async deleteAllTenants(req: Request, res: Response, next: NextFunction) {
+    try {
+      await this.tenantService.deleteAll();
+
+      return res.status(204).send();
+    } catch (error) {
+      this.logger.error(error);
+      return next(error);
+    }
+  }
 }
 
 export default TenantController;

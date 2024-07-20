@@ -38,9 +38,27 @@ router.get("/:id", (req: Request, res: Response, next: NextFunction) =>
 
 router.patch(
   "/:id",
+  authenticateMiddleware,
+  canAccess([UserRole.Admin]),
   updateTenantValidator,
   (req: Request, res: Response, next: NextFunction) =>
     tenantController.updateTenant(req, res, next)
+);
+
+router.delete(
+  "/",
+  authenticateMiddleware,
+  canAccess([UserRole.Admin]),
+  (req: Request, res: Response, next: NextFunction) =>
+    tenantController.deleteAllTenants(req, res, next)
+);
+
+router.delete(
+  "/:id",
+  authenticateMiddleware,
+  canAccess([UserRole.Admin]),
+  (req: Request, res: Response, next: NextFunction) =>
+    tenantController.deleteTenant(req, res, next)
 );
 
 export default router;

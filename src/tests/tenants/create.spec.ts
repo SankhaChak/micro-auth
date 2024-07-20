@@ -33,6 +33,10 @@ describe("POST /tenants", () => {
     await dataSource.synchronize();
   });
 
+  afterEach(async () => {
+    jwks.stop();
+  });
+
   afterAll(async () => {
     await dataSource.destroy();
   });

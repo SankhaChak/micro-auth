@@ -79,6 +79,37 @@ class TenantService {
       throw err;
     }
   }
+
+  async deleteAll() {
+    try {
+      await this.tenantRepository.delete({});
+    } catch (error) {
+      const err = createHttpError(500, "Failed to delete tenants");
+      throw err;
+    }
+  }
+
+  async delete(id: string) {
+    try {
+      const tenant = await this.tenantRepository.findOne({
+        where: { id: +id }
+      });
+
+      if (!tenant) {
+        const error = createHttpError(404, "Tenant not found");
+        throw error;
+      }
+
+      await this.tenantRepository.delete({ id: +id });
+    } catch (error) {
+      if (error instanceof createHttpError.HttpError) {
+        throw error;
+      }
+
+      const err = createHttpError(500, "Failed to delete tenant");
+      throw err;
+    }
+  }
 }
 
 export default TenantService;
