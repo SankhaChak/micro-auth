@@ -36,6 +36,7 @@ describe("GET /tenants & /tenant/:id", () => {
   });
 
   afterAll(async () => {
+    await dataSource.dropDatabase();
     await dataSource.destroy();
   });
 

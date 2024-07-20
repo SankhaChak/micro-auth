@@ -52,6 +52,8 @@ describe("PATCH /tenants/:id", () => {
 
   afterAll(async () => {
     jwks.stop();
+
+    await dataSource.dropDatabase();
     await dataSource.destroy();
   });
 

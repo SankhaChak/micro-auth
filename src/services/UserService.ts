@@ -1,7 +1,8 @@
 import createHttpError from "http-errors";
 import { Repository } from "typeorm";
 import { User } from "../entity/User";
-import { UserData, UserRole } from "../types/auth";
+import { UserRole } from "../types/auth";
+import { UserData } from "../types/user";
 import CredentialService from "./CredentialService";
 
 class UserService {
@@ -16,7 +17,7 @@ class UserService {
     this.credentialService = credentialService;
   }
 
-  async create(params: UserData) {
+  async create(params: Partial<UserData>) {
     try {
       const doesUserExist = await this.userRepository.findOne({
         where: { email: params.email }
@@ -31,15 +32,16 @@ class UserService {
       }
 
       const hashedPassword = await this.credentialService.hashString(
-        params.password
+        params.password!
       );
 
       const user = await this.userRepository.save({
         email: params.email,
         firstName: params.firstName,
         lastName: params.lastName,
-        role: UserRole.Customer,
-        password: hashedPassword
+        role: params.role || UserRole.Customer,
+        password: hashedPassword,
+        tenant: params.tenantId ? { id: params.tenantId } : undefined
       });
 
       return user;

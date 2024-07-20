@@ -5,6 +5,7 @@ import "reflect-metadata";
 import logger from "./config/logger";
 import authRouter from "./routes/auth";
 import tenantRouter from "./routes/tenant";
+import userRouter from "./routes/user";
 
 const app = express();
 
@@ -18,6 +19,7 @@ app.use(express.json());
 
 app.use("/auth", authRouter);
 app.use("/tenants", tenantRouter);
+app.use("/users", userRouter);
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 app.use((err: HttpError, req: Request, res: Response, _next: NextFunction) => {

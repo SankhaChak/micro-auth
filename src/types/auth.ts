@@ -1,6 +1,6 @@
 import { Request } from "express";
 
-export interface UserData {
+export interface AuthUserData {
   email: string;
   firstName: string;
   lastName: string;
@@ -8,7 +8,7 @@ export interface UserData {
   role: UserRole;
 }
 export interface RegisterUserRequest extends Request {
-  body: UserData;
+  body: AuthUserData;
 }
 
 export interface LoginUserRequest extends Request {
