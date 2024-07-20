@@ -26,4 +26,12 @@ router.post(
     tenantController.createTenant(req, res, next)
 );
 
+router.get("/", (req: Request, res: Response, next: NextFunction) =>
+  tenantController.getTenants(req, res, next)
+);
+
+router.get("/:id", (req: Request, res: Response, next: NextFunction) =>
+  tenantController.getTenant(req, res, next)
+);
+
 export default router;

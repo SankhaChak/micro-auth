@@ -1,4 +1,4 @@
-import { NextFunction, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { validationResult } from "express-validator";
 import createHttpError from "http-errors";
 import { Logger } from "winston";
@@ -32,6 +32,30 @@ class TenantController {
       const tenant = await this.tenantService.create(rqBody);
 
       return res.status(201).json({ id: tenant.id });
+    } catch (err) {
+      this.logger.error(err);
+      return next(err);
+    }
+  }
+
+  async getTenants(req: Request, res: Response, next: NextFunction) {
+    try {
+      const tenants = await this.tenantService.getAll();
+
+      return res.status(200).json(tenants);
+    } catch (err) {
+      this.logger.error(err);
+      return next(err);
+    }
+  }
+
+  async getTenant(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { id } = req.params;
+
+      const tenant = await this.tenantService.getById(id);
+
+      return res.status(200).json(tenant);
     } catch (err) {
       this.logger.error(err);
       return next(err);
