@@ -63,6 +63,22 @@ describe("POST /tenants", () => {
       const response = await request(app).post(endpoint).send(tenantData);
       expect(response.statusCode).toBe(401);
     });
+
+    it("should return 403 status code if user is not authenticated", async () => {
+      const customerAccessToken = jwks.token({
+        sub: "test-user",
+        role: UserRole.Customer
+      });
+      const response = await request(app)
+        .post(endpoint)
+        .set("Cookie", [`accessToken=${customerAccessToken};`])
+        .send(tenantData);
+
+      const tenantsInDb = await dataSource.getRepository(Tenant).find();
+
+      expect(response.statusCode).toBe(403);
+      expect(tenantsInDb).toHaveLength(0);
+    });
   });
 
   describe("Fields are missing", () => {
