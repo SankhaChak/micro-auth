@@ -74,9 +74,11 @@ class TenantController {
         throw error;
       }
 
-      const tenant = await this.tenantService.update(id, rqBody);
+      await this.tenantService.update(id, rqBody);
 
-      return res.status(200).json(tenant);
+      return res.status(200).json({
+        id
+      });
     } catch (error) {
       this.logger.error(error);
       return next(error);

@@ -1,4 +1,5 @@
 import { checkSchema } from "express-validator";
+import { UserRole } from "../types/auth";
 
 // const registerValidator = [
 //   body("email")
@@ -26,6 +27,26 @@ const registerValidator = checkSchema({
     isLength: {
       errorMessage: "Password should be at least 6 chars long",
       options: { min: 8 }
+    }
+  },
+  firstName: {
+    notEmpty: {
+      errorMessage: "First name is required!"
+    },
+    trim: true
+  },
+  lastName: {
+    notEmpty: {
+      errorMessage: "Last name is required!"
+    },
+    trim: true
+  },
+  role: {
+    optional: true,
+    trim: true,
+    isIn: {
+      options: [[UserRole.Customer]],
+      errorMessage: "Invalid role!"
     }
   }
 });

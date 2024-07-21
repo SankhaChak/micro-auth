@@ -68,8 +68,6 @@ class TenantService {
       }
 
       await this.tenantRepository.update({ id: +id }, params);
-
-      return tenant;
     } catch (error) {
       if (error instanceof createHttpError.HttpError) {
         throw error;
