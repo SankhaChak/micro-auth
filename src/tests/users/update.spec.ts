@@ -12,6 +12,7 @@ describe("PATCH /users/:id", () => {
   let jwks: ReturnType<typeof createJWKSMock>;
   let adminToken: string;
   let nonAdminToken: string;
+  let userPayload: Partial<User>[];
 
   const singleUserEndpoint = "/users/1";
   const numberOfUsersToPopulate = 5;
@@ -44,6 +45,7 @@ describe("PATCH /users/:id", () => {
     await dataSource.synchronize();
 
     await populateTenants(dataSource);
+    userPayload = await populateUsers(dataSource, numberOfUsersToPopulate);
   });
 
   afterAll(async () => {
@@ -55,8 +57,6 @@ describe("PATCH /users/:id", () => {
 
   describe("Update user", () => {
     it("should return 200 status code", async () => {
-      await populateUsers(dataSource, numberOfUsersToPopulate);
-
       const response = await request(app)
         .patch(singleUserEndpoint)
         .set("Cookie", [`accessToken=${adminToken};`])
@@ -65,8 +65,6 @@ describe("PATCH /users/:id", () => {
     });
 
     it("should return the updated user", async () => {
-      await populateUsers(dataSource, numberOfUsersToPopulate);
-
       const response = await request(app)
         .patch(singleUserEndpoint)
         .set("Cookie", [`accessToken=${adminToken};`])
@@ -87,11 +85,6 @@ describe("PATCH /users/:id", () => {
     });
 
     it("should return 400 status code if email is already taken", async () => {
-      const userPayload = await populateUsers(
-        dataSource,
-        numberOfUsersToPopulate
-      );
-
       const response = await request(app)
         .patch(singleUserEndpoint)
         .set("Cookie", [`accessToken=${adminToken};`])
@@ -115,11 +108,6 @@ describe("PATCH /users/:id", () => {
     });
 
     it("should only update the provided fields", async () => {
-      const userPayload = await populateUsers(
-        dataSource,
-        numberOfUsersToPopulate
-      );
-
       const response = await request(app)
         .patch(singleUserEndpoint)
         .set("Cookie", [`accessToken=${adminToken};`])
@@ -132,8 +120,6 @@ describe("PATCH /users/:id", () => {
     });
 
     it("should not return user password in the response", async () => {
-      await populateUsers(dataSource, numberOfUsersToPopulate);
-
       const response = await request(app)
         .patch(singleUserEndpoint)
         .set("Cookie", [`accessToken=${adminToken};`])

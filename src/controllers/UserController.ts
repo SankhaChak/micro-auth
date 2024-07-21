@@ -100,6 +100,18 @@ class UserController {
       return next(err);
     }
   }
+
+  async delete(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { id } = req.params;
+      await this.userService.delete(id);
+
+      return res.status(204).send();
+    } catch (err) {
+      this.logger.error(err);
+      return next(err);
+    }
+  }
 }
 
 export default UserController;

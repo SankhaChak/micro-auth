@@ -122,6 +122,7 @@ class UserService {
       }
 
       // const updatedUser = await this.userRepository.update({ id: +id }, params);
+      // Using save method instead of update method to get the updated user in the return value
       const updatedUser = await this.userRepository.save({
         ...user,
         ...params
@@ -134,6 +135,26 @@ class UserService {
       }
 
       const error = createHttpError(500, "Failed to update user");
+      throw error;
+    }
+  }
+
+  async delete(id: string) {
+    try {
+      const user = await this.findById(id);
+
+      if (!user) {
+        const error = createHttpError(404, `User with id ${id} not found`);
+        throw error;
+      }
+
+      await this.userRepository.delete({ id: +id });
+    } catch (err) {
+      if (err instanceof createHttpError.HttpError) {
+        throw err;
+      }
+
+      const error = createHttpError(500, "Failed to delete user");
       throw error;
     }
   }

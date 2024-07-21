@@ -56,4 +56,12 @@ router.patch(
     userController.update(req, res, next)
 );
 
+router.delete(
+  "/:id",
+  authenticateMiddleware,
+  canAccess([UserRole.Admin]),
+  (req: Request, res: Response, next: NextFunction) =>
+    userController.delete(req, res, next)
+);
+
 export default router;
