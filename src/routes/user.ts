@@ -9,7 +9,9 @@ import canAccess from "../middlewares/canAccess";
 import CredentialService from "../services/CredentialService";
 import UserService from "../services/UserService";
 import { UserRole } from "../types/auth";
-import createUserValidator from "../validators/user-validator";
+import createUserValidator, {
+  updateUserValidator
+} from "../validators/user-validator";
 
 const router = express.Router();
 const userRepository = AppDataSource.getRepository(User);
@@ -43,6 +45,15 @@ router.get(
   // getUsersValidator,
   (req: Request, res: Response, next: NextFunction) =>
     userController.getById(req, res, next)
+);
+
+router.patch(
+  "/:id",
+  authenticateMiddleware,
+  canAccess([UserRole.Admin]),
+  updateUserValidator,
+  (req: Request, res: Response, next: NextFunction) =>
+    userController.update(req, res, next)
 );
 
 export default router;

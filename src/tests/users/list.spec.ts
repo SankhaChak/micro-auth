@@ -3,6 +3,7 @@ import request from "supertest";
 import { DataSource } from "typeorm";
 import app from "../../app";
 import { AppDataSource } from "../../data-source";
+import { User } from "../../entity/User";
 import { UserRole } from "../../types/auth";
 import { populateTenants, populateUsers } from "../utils";
 
@@ -94,6 +95,23 @@ describe("GET /users & /users/:id", () => {
         .send();
       expect(response.statusCode).toBe(403);
     });
+
+    it("should not return user password in the response", async () => {
+      await populateUsers(dataSource, numberOfUsersToPopulate);
+
+      const response = await request(app)
+        .get(allUsersEndpoint)
+        .set("Cookie", [`accessToken=${adminToken};`])
+        .send();
+
+      const doesUsersHavePassword = response.body.some(
+        (user: Partial<User>) => {
+          return !!user.password;
+        }
+      );
+
+      expect(doesUsersHavePassword).toBe(false);
+    });
   });
 
   describe("List user with a particular id", () => {
@@ -138,6 +156,16 @@ describe("GET /users & /users/:id", () => {
         .set("Cookie", [`accessToken=${nonAdminToken};`])
         .send();
       expect(response.statusCode).toBe(403);
+    });
+
+    it("should not return user password in the response", async () => {
+      await populateUsers(dataSource, numberOfUsersToPopulate);
+
+      const response = await request(app)
+        .get(singleUserEndpoint)
+        .set("Cookie", [`accessToken=${adminToken};`])
+        .send();
+      expect(response.body).not.toHaveProperty("password");
     });
   });
 });

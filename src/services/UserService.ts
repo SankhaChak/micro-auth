@@ -99,6 +99,44 @@ class UserService {
       throw error;
     }
   }
+
+  async update(id: string, params: Partial<UserData>) {
+    try {
+      const user = await this.findById(id);
+
+      if (!user) {
+        const error = createHttpError(404, `User with id ${id} not found`);
+        throw error;
+      }
+
+      if (params.email) {
+        const doesUserExist = await this.findByEmail(params.email);
+
+        if (doesUserExist) {
+          const error = createHttpError(
+            400,
+            "User with this email already exists"
+          );
+          throw error;
+        }
+      }
+
+      // const updatedUser = await this.userRepository.update({ id: +id }, params);
+      const updatedUser = await this.userRepository.save({
+        ...user,
+        ...params
+      });
+
+      return updatedUser;
+    } catch (err) {
+      if (err instanceof createHttpError.HttpError) {
+        throw err;
+      }
+
+      const error = createHttpError(500, "Failed to update user");
+      throw error;
+    }
+  }
 }
 
 export default UserService;

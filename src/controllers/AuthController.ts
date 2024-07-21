@@ -142,7 +142,7 @@ class AuthController {
         throw error;
       }
 
-      const sanitizedUser = this.getSanitizedUser(user);
+      const sanitizedUser = AuthController.getSanitizedUser(user);
 
       res.status(200).send(sanitizedUser);
     } catch (error) {
@@ -160,7 +160,7 @@ class AuthController {
         throw error;
       }
 
-      const sanitizedUser = this.getSanitizedUser(user);
+      const sanitizedUser = AuthController.getSanitizedUser(user);
 
       await this.tokenService.deleteRefreshToken(req.auth.id as string);
       await this.attachTokenCookies(sanitizedUser, res, next);
@@ -178,7 +178,7 @@ class AuthController {
     next: NextFunction
   ) {
     try {
-      const sanitizedUser = this.getSanitizedUser(user as User);
+      const sanitizedUser = AuthController.getSanitizedUser(user as User);
 
       const payload: JwtPayload = {
         sub: String(sanitizedUser.id),
@@ -219,7 +219,7 @@ class AuthController {
     }
   }
 
-  getSanitizedUser(user: User) {
+  static getSanitizedUser(user: User) {
     return omit(user, ["password"]);
   }
 }

@@ -71,4 +71,40 @@ export const getUsersValidator = checkSchema(
   ["query"]
 );
 
+export const updateUserValidator = checkSchema({
+  email: {
+    optional: true,
+    trim: true,
+    isEmail: {
+      errorMessage: "Should be a valid email"
+    }
+  },
+  firstName: {
+    optional: true,
+    trim: true
+  },
+  lastName: {
+    optional: true,
+    trim: true
+  },
+  password: {
+    optional: true,
+    trim: true,
+    isLength: {
+      options: {
+        min: 8
+      },
+      errorMessage: "Password length should be at least 8 chars!"
+    }
+  },
+  role: {
+    optional: true,
+    trim: true,
+    isIn: {
+      options: [UserRole.Manager],
+      errorMessage: "Only manager role is allowed!"
+    }
+  }
+});
+
 export default createUserValidator;

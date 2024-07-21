@@ -4,6 +4,7 @@ import createHttpError from "http-errors";
 import { Logger } from "winston";
 import UserService from "../services/UserService";
 import { CreateUserRequest } from "../types/user";
+import AuthController from "./AuthController";
 
 class UserController {
   private userService: UserService;
@@ -44,7 +45,11 @@ class UserController {
 
       const users = await this.userService.findAll();
 
-      return res.status(200).json(users);
+      const sanitizedUsers = users.map((user) =>
+        AuthController.getSanitizedUser(user)
+      );
+
+      return res.status(200).json(sanitizedUsers);
     } catch (err) {
       this.logger.error(err);
       return next(err);
@@ -67,7 +72,29 @@ class UserController {
         throw error;
       }
 
-      return res.status(200).json(user);
+      const sanitizedUser = AuthController.getSanitizedUser(user);
+
+      return res.status(200).json(sanitizedUser);
+    } catch (err) {
+      this.logger.error(err);
+      return next(err);
+    }
+  }
+
+  async update(req: Request, res: Response, next: NextFunction) {
+    try {
+      const result = validationResult(req);
+      if (!result.isEmpty()) {
+        const error = createHttpError(400, result.array());
+        throw error;
+      }
+
+      const { id } = req.params;
+      const user = await this.userService.update(id, req.body);
+
+      const sanitizedUser = AuthController.getSanitizedUser(user);
+
+      return res.status(200).json(sanitizedUser);
     } catch (err) {
       this.logger.error(err);
       return next(err);
