@@ -48,4 +48,27 @@ const createUserValidator = checkSchema({
   }
 });
 
+export const getUsersValidator = checkSchema(
+  {
+    // query: {
+    //   page: {
+    //     optional: true,
+    //     isInt: {
+    //       errorMessage: "Page should be an integer"
+    //     }
+    //   },
+    //   limit: {
+    //     optional: true,
+    //     isInt: {
+    //       errorMessage: "Limit should be an integer"
+    //     }
+    //   }
+    // }
+    role: {
+      optional: true
+    }
+  },
+  ["query"]
+);
+
 export default createUserValidator;

@@ -27,4 +27,22 @@ router.post(
     userController.create(req, res, next)
 );
 
+router.get(
+  "/",
+  authenticateMiddleware,
+  canAccess([UserRole.Admin]),
+  // getUsersValidator,
+  (req: Request, res: Response, next: NextFunction) =>
+    userController.getAll(req, res, next)
+);
+
+router.get(
+  "/:id",
+  authenticateMiddleware,
+  canAccess([UserRole.Admin]),
+  // getUsersValidator,
+  (req: Request, res: Response, next: NextFunction) =>
+    userController.getById(req, res, next)
+);
+
 export default router;

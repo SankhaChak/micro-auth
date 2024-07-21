@@ -88,6 +88,17 @@ class UserService {
       throw error;
     }
   }
+
+  async findAll() {
+    try {
+      const users = await this.userRepository.find();
+
+      return users;
+    } catch (err) {
+      const error = createHttpError(500, "Failed to find all users");
+      throw error;
+    }
+  }
 }
 
 export default UserService;

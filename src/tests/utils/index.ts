@@ -1,4 +1,7 @@
 import { DataSource } from "typeorm";
+import { Tenant } from "../../entity/Tenant";
+import { User } from "../../entity/User";
+import { UserRole } from "../../types/auth";
 
 export const truncateTables = async (dataSource: DataSource) => {
   const entities = dataSource.entityMetadatas;
@@ -39,4 +42,43 @@ export const extractAuthTokensFromCookies = (cookies: string[]) => {
   });
 
   return { accessToken, refreshToken };
+};
+
+export const populateTenants = async (
+  dataSource: DataSource,
+  quantity = 10
+) => {
+  const tenantsPayload = Array.from({ length: quantity }, (_, index) => ({
+    name: `Tenant ${index}`,
+    address: `Address ${index}`
+  }));
+
+  await dataSource
+    .createQueryBuilder()
+    .insert()
+    .into(Tenant)
+    .values(tenantsPayload)
+    .execute();
+
+  return tenantsPayload;
+};
+
+export const populateUsers = async (dataSource: DataSource, quantity = 10) => {
+  const usersPayload = Array.from({ length: quantity }, (_, index) => ({
+    firstName: `User ${index}`,
+    lastName: `User ${index}`,
+    email: `randomemail${index}@gmail.com`,
+    password: "passwordSecret",
+    role: Math.random() > 0.5 ? UserRole.Manager : UserRole.Customer,
+    tenantId: 1
+  }));
+
+  await dataSource
+    .createQueryBuilder()
+    .insert()
+    .into(User)
+    .values(usersPayload)
+    .execute();
+
+  return usersPayload;
 };
