@@ -4,5 +4,13 @@ export default {
   transform: {
     "^.+.tsx?$": ["ts-jest", {}]
   },
-  verbose: true
+  verbose: true,
+  collectCoverage: true,
+  coverageProvider: "v8",
+  collectCoverageFrom: [
+    "src/**/*.ts",
+    "!src/tests/*.spec.ts",
+    "!node_modules/**",
+    "!dist/**"
+  ]
 };
