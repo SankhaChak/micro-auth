@@ -1,26 +1,23 @@
-import fs from "fs";
-import createHttpError from "http-errors";
 import { JwtPayload, sign } from "jsonwebtoken";
-import path from "path";
 import { CONFIG } from "../config";
 import { AppDataSource } from "../data-source";
 import { RefreshToken } from "../entity/RefreshToken";
 
 class TokenService {
   generateAccessToken(payload: JwtPayload) {
-    let privateKey: string;
+    // let privateKey: string;
 
-    try {
-      privateKey = fs.readFileSync(
-        path.join(__dirname, "../../certs/private.pem"),
-        "utf-8"
-      );
-    } catch (err) {
-      const error = createHttpError(500, "Error reading private key");
-      throw error;
-    }
+    // try {
+    //   privateKey = fs.readFileSync(
+    //     path.join(__dirname, "../../certs/private.pem"),
+    //     "utf-8"
+    //   );
+    // } catch (err) {
+    //   const error = createHttpError(500, "Error reading private key");
+    //   throw error;
+    // }
 
-    const accessToken = sign(payload, privateKey, {
+    const accessToken = sign(payload, CONFIG.PRIVATE_KEY, {
       algorithm: "RS256",
       expiresIn: "1d",
       issuer: "auth-service"
