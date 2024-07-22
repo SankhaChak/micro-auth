@@ -29,7 +29,7 @@ jobs:
           DB_HOST: ${{secrets.DB_HOST_TEST}}
           DB_PORT: ${{secrets.DB_PORT_TEST}}
           DB_NAME: ${{secrets.DB_NAME_TEST}}
-          DB_USERNAME: ${{secrets.DB_USERNAME_TEST}}
+          DB_USER: ${{secrets.DB_USERNAME_TEST}}
           DB_PASSWORD: ${{secrets.DB_PASSWORD_TEST}}
           REFRESH_TOKEN_SECRET: ${{secrets.REFRESH_TOKEN_TEST}}
           JWKS_URI: ${{secrets.JWKS_URI_TEST}}
