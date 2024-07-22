@@ -65,7 +65,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
       - name: Build Docker image
-        run: docker build . -t ${{env.IMG_NAME}}:${{env.IMG_TAG}} -f docker/prod/Dockerfile .
+        run: docker build -t ${{env.IMG_NAME}}:${{env.IMG_TAG}} -f docker/prod/Dockerfile .
 
       - name: Push Docker image to Docker Hub
         run: docker push ${{env.IMG_NAME}}:${{env.IMG_TAG}}
