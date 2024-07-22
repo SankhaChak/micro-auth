@@ -1,0 +1,71 @@
+name: CI
+on:
+  pull_request:
+    branches:
+      - main
+
+  push:
+    branches:
+      - main
+jobs:
+  build-and-test:
+    name: Build the project
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install pnpm
+        run: npm install -g pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run lint
+        run: pnpm lint
+
+      - name: Test and coverage
+        run: pnpm test
+        env:
+          DB_HOST: ${{secrets.DB_HOST_TEST}}
+          DB_PORT: ${{secrets.DB_PORT_TEST}}
+          DB_NAME: ${{secrets.DB_NAME_TEST}}
+          DB_USERNAME: ${{secrets.DB_USERNAME_TEST}}
+          DB_PASSWORD: ${{secrets.DB_PASSWORD_TEST}}
+          REFRESH_TOKEN_SECRET: ${{secrets.REFRESH_TOKEN_TEST}}
+          JWKS_URI: ${{secrets.JWKS_URI_TEST}}
+          PRIVATE_KEY: ${{secrets.PRIVATE_KEY_TEST}}
+
+      - name: Build
+        run: pnpm build
+
+      - name: Sonar Cloud Scan
+        uses: sonarsource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+          SONAR_TOKEN: ${{secrets.SONAR_TOKEN}}
+
+  upload-docker-image:
+    name: Upload Docker image
+    runs-on: ubuntu-latest
+    needs: build-and-test
+    env:
+      IMG_NAME: sankhachak/micro-auth
+      IMG_TAG: build-${{ github.run_number }}
+
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+
+      - name: Build Docker image
+        run: docker build . -t ${{env.IMG_NAME}}:${{env.IMG_TAG}} -f docker/prod/Dockerfile .
+
+      - name: Push Docker image to Docker Hub
+        run: docker push ${{env.IMG_NAME}}:${{env.IMG_TAG}}
