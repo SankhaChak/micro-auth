@@ -22,6 +22,9 @@ export class User {
   @Column()
   role!: UserRole;
 
-  @ManyToOne(() => Tenant)
+  @ManyToOne(
+    () => Tenant
+    // , { onDelete: "CASCADE" }
+  )
   tenant!: Tenant;
 }

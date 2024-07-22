@@ -14,7 +14,7 @@ export default tseslint.config(
         tsconfigRootDir: import.meta.dirname
       }
     },
-    ignores: ["node_modules", "dist", "**/.*"],
+    ignores: ["node_modules", "dist/**", "**/.*", "src/tests/**"],
     rules: {
       "@typescript-eslint/naming-convention": [
         "error",

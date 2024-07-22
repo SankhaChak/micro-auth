@@ -1,6 +1,10 @@
+import path from "path";
 import "reflect-metadata";
 import { DataSource } from "typeorm";
 import { CONFIG } from "./config";
+
+const isProduction = CONFIG.NODE_ENV === "production";
+const baseDir = isProduction ? "dist/src" : "src";
 
 export const AppDataSource = new DataSource({
   type: "postgres",
@@ -12,7 +16,7 @@ export const AppDataSource = new DataSource({
   // synchronize: CONFIG.NODE_ENV === "production" ? false : true,
   synchronize: false,
   logging: false,
-  entities: ["src/entity/*.ts"],
-  migrations: ["src/migration/*.ts"],
+  entities: [path.join(__dirname, `../${baseDir}/entity/*.{js,ts}`)],
+  migrations: [path.join(__dirname, `../${baseDir}/migration/*.{js,ts}`)],
   subscribers: []
 });

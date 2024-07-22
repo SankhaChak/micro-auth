@@ -32,8 +32,12 @@ router.get("/", (req: Request, res: Response, next: NextFunction) =>
   tenantController.getTenants(req, res, next)
 );
 
-router.get("/:id", (req: Request, res: Response, next: NextFunction) =>
-  tenantController.getTenant(req, res, next)
+router.get(
+  "/:id",
+  authenticateMiddleware,
+  canAccess([UserRole.Admin]),
+  (req: Request, res: Response, next: NextFunction) =>
+    tenantController.getTenant(req, res, next)
 );
 
 router.patch(
