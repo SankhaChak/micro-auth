@@ -1,4 +1,4 @@
-FROM node:18-alpine as builder
+FROM node:20-alpine as builder
 
 WORKDIR /app
 
@@ -9,11 +9,13 @@ COPY pnpm-lock.yaml ./
 
 RUN pnpm install --frozen-lockfile
 
+RUN ls -la node_modules
+
 COPY . .
 
 RUN pnpm build
 
-FROM node:18-alpine as production
+FROM node:20-alpine as production
 
 ENV NODE_ENV=production
 
