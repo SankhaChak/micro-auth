@@ -15,6 +15,7 @@ const startServer = async () => {
       logger.info(`Server running on port ${port}`);
     });
   } catch (error) {
+    console.log("🚀 ~ file: index.ts:18 ~ startServer ~ error:", error);
     if (error instanceof Error) {
       logger.error("🚀 ~ file: index.ts:13 ~ startServer ~ error:", error);
       setTimeout(() => {
