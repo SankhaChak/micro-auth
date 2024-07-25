@@ -1,4 +1,4 @@
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 
 class CredentialService {
   private saltRounds: number = 10;
@@ -10,7 +10,8 @@ class CredentialService {
   }
 
   async hashString(plainString: string): Promise<string> {
-    return await bcrypt.hash(plainString, this.saltRounds);
+    const salt = await bcrypt.genSalt(this.saltRounds);
+    return await bcrypt.hash(plainString, salt);
   }
 
   async compareStrings(

@@ -4,8 +4,6 @@ import { z } from "zod";
 
 config({ path: path.join(__dirname, `../../.env.${process.env.NODE_ENV}`) });
 
-console.log(process.env);
-
 const envSchema = z.object({
   PORT: z.string().default("3000"),
   NODE_ENV: z.enum(["dev", "test", "production"]).default("dev"),
